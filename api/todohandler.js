@@ -1,19 +1,19 @@
 'use strict';
 const dynamo = require("../config/dynamo");
-const ObjectId = require("node-time-uuid");
+const { v4: uuidv4 } = require("uuid");
+const currentDate = new Date();
 
 const createTodo = async (event, context) => {
     const requestBody = JSON.parse(event.body);
     const todo = requestBody;
-
-    var uuid = new ObjectId();
     const params = {
         TableName: process.env.DYNAMODB_TABLE,
         Item: {
+            todoId: { S: uuidv4() },
             userId: { S: todo.userId },
-            id: { S: uuid.toString() },
             title: { S: todo.title },
             description: { S: todo.description },
+            createdAt: { S: currentDate.toISOString() },
             status: { S: todo.status }
         }
     }
