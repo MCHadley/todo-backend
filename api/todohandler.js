@@ -9,7 +9,7 @@ const createTodo = async (event, context) => {
     const params = {
         TableName: process.env.DYNAMODB_TABLE,
         Item: {
-            todoId: { S: uuidv4() },
+            id: { S: uuidv4() },
             userId: { S: todo.userId },
             title: { S: todo.title },
             description: { S: todo.description },
