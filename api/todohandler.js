@@ -1,5 +1,5 @@
 'use strict';
-const dynamo = require("../config/dynamoPut");
+const dynamo = require("../config/dynamo");
 const ObjectId = require("node-time-uuid");
 
 const createTodo = async (event, context) => {
