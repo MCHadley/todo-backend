@@ -39,11 +39,14 @@ functions:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self.provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}
   getTodos:
-    handler: api/todohandler.getTodos
+    handler: api/todohandler.queryTodos
     events:
       - httpApi:
           path: /todos
           method: GET
+          RequestParameters:
+            querystrings:
+              status: true
     response:
       headers:
         Content-Type: "'application/json'"

@@ -1,8 +1,9 @@
 const { DynamoDBClient, PutItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
+const { QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
 const putItem = async (item) => {
     // Create an instance of the DynamoDB client
-    const client = new DynamoDBClient({ region: "us-east-1" }); // Replace with your desired region
+    const client = new DynamoDBClient({ region: "us-east-1" });
 
     // Create a PutItem command with the prepared parameters
     const command = new PutItemCommand(item);
@@ -20,7 +21,7 @@ const putItem = async (item) => {
 
 const scanTable = async (tableName) => {
     // Create a DynamoDB client
-    const client = new DynamoDBClient({ region: 'us-east-1' }); // Replace with your desired region
+    const client = new DynamoDBClient({ region: 'us-east-1' });
 
     // Create a ScanCommand
     const scanCommand = new ScanCommand({ TableName: tableName });
@@ -35,7 +36,31 @@ const scanTable = async (tableName) => {
     }
 };
 
+const queryTable = async (tableName, gsi1pk) => {
+    const client = new DynamoDBClient({ region: 'us-east-1' });
+
+    const params = {
+        TableName: tableName,
+        IndexName: 'gsi1pk',
+        KeyConditionExpression: 'gsi1pk = :gsi1pk',
+        ExpressionAttributeValues: {
+            ':gsi1pk': gsi1pk
+        }
+    }
+
+    const queryCommand = new QueryCommand(params)
+
+    try {
+        const response = await client.send(queryCommand)
+        const items = response.Items;
+        return items;
+    } catch (error) {
+        console.error('Error querying table:', error);
+    }
+}
+
 module.exports = {
     putItem,
-    scanTable
+    scanTable,
+    queryTable
 };

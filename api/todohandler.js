@@ -14,24 +14,35 @@ const createTodo = async (event, context) => {
             title: { S: todo.title },
             description: { S: todo.description },
             createdAt: { S: currentDate.toISOString() },
-            status: { S: todo.status }
+            status: { S: todo.status },
+            entityType: { S: 'todo' },
+            gsi1pk: { S: `${todo.userId}#todo` }
         }
     }
     const result = await dynamo.putItem(params);
     return result;
 }
 
-const getTodos = async (event, context) => {
+const scanTodos = async (event, context) => {
     const tableName = process.env.DYNAMODB_TABLE;
     const result = await dynamo.scanTable(tableName);
-    console.log(result);
     return {
         statusCode: 200,
         body: JSON.stringify(result)
     };
 }
 
+const queryTodos = async (event, context) => {
+    const tableName = process.env.DYNAMODB_TABLE;
+    const result = await dynamo.queryTable(tableName, `${event.queryStringParameters.userId}#todo`);
+    return {
+        statusCode: 200,
+        body: JSON.stringify(result)
+    }
+}
+
 module.exports = {
     createTodo,
-    getTodos
+    scanTodos,
+    queryTodos
 }
