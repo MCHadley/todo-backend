@@ -1,12 +1,26 @@
 const { DynamoDBClient, PutItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
 const { QueryCommand } = require("@aws-sdk/lib-dynamodb");
+const { v4: uuidv4 } = require("uuid");
+const currentDate = new Date();
 
 const putItem = async (item) => {
     // Create an instance of the DynamoDB client
     const client = new DynamoDBClient({ region: "us-east-1" });
-
+    const params = {
+        TableName: process.env.DYNAMODB_TABLE,
+        Item: {
+            id: { S: uuidv4() },
+            userId: { S: item.userId },
+            title: { S: item.title },
+            description: { S: item.description },
+            createdAt: { S: currentDate.toISOString() },
+            status: { S: item.status },
+            entityType: { S: 'todo' },
+            gsi1pk: { S: `${item.userId}#todo` }
+        }
+    }
     // Create a PutItem command with the prepared parameters
-    const command = new PutItemCommand(item);
+    const command = new PutItemCommand(params);
 
     try {
         // Execute the PutItem command
