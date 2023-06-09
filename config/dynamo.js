@@ -33,23 +33,6 @@ const putItem = async (item) => {
     }
 };
 
-const scanTable = async (tableName) => {
-    // Create a DynamoDB client
-    const client = new DynamoDBClient({ region: 'us-east-1' });
-
-    // Create a ScanCommand
-    const scanCommand = new ScanCommand({ TableName: tableName });
-
-    try {
-        // Execute the Scan command
-        const response = await client.send(scanCommand);
-        const items = response.Items;
-        return items;
-    } catch (error) {
-        console.error('Error scanning table:', error);
-    }
-};
-
 const queryTable = async (tableName, gsi1pk) => {
     const client = new DynamoDBClient({ region: 'us-east-1' });
 

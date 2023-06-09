@@ -6,7 +6,7 @@ const createTodo = async (event, context) => {
     const requestBody = JSON.parse(event.body);
     const todo = requestBody;
     const result = await dynamo.putItem(todo);
-    if (result.success === "true") {
+    if (result.success == true) {
         return {
             statusCode: 200,
             body: JSON.stringify(result.message)
@@ -17,15 +17,6 @@ const createTodo = async (event, context) => {
             body: JSON.stringify(result.message)
         }
     }
-}
-
-const scanTodos = async (event, context) => {
-    const tableName = process.env.DYNAMODB_TABLE;
-    const result = await dynamo.scanTable(tableName);
-    return {
-        statusCode: 200,
-        body: JSON.stringify(result)
-    };
 }
 
 const queryTodos = async (event, context) => {
@@ -39,6 +30,5 @@ const queryTodos = async (event, context) => {
 
 module.exports = {
     createTodo,
-    scanTodos,
     queryTodos
 }
