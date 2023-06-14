@@ -1,5 +1,5 @@
-const { DynamoDBClient, UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, QueryCommand, PutCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
 const client = new DynamoDBClient({ region: 'us-east-1' });
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 const { v4: uuidv4 } = require("uuid");
@@ -60,7 +60,7 @@ const deleteItem = async (tableName, todoId, userId) => {
         Key: { id: todoId, userId: userId }
     }
     const deleteCommmand = new DeleteCommand(commandInput)
-    
+
     try {
         const response = await ddbDocClient.send(deleteCommmand)
         return response
@@ -70,29 +70,27 @@ const deleteItem = async (tableName, todoId, userId) => {
 }
 
 const updateItem = async (tableName, todoItem) => {
-    const client = new DynamoDBClient({ region: 'us-east-1' });
     const params = {
         TableName: tableName,
-        Key: {
-            id: { "S": todoItem.id },
-            userId: { "S": todoItem.userId }
-        },
-        UpdateExpression: 'SET #status = :status, #description = :description, #title = :title',
+        Key: { id: todoItem.id, userId: todoItem.userId },
+        UpdateExpression: 'SET #status = :s, #description = :d, #title = :t',
         ExpressionAttributeNames: {
-            '#status': 'status',
-            '#description': 'description',
-            '#title': 'title'
+            "#status": "status",
+            "#description": "description",
+            "#title": "title"
+
         },
         ExpressionAttributeValues: {
-            ':status': { "S": todoItem.status },
-            ':description': { "S": todoItem.description },
-            ':title': { "S": todoItem.title }
+            ":s": todoItem.status,
+            ":d": todoItem.description,
+            ":t": todoItem.title
         }
-    };
-    const updateCommand = new UpdateItemCommand(params)
+
+    }
+    const updateCommand = new UpdateCommand(params)
 
     try {
-        const response = await client.send(updateCommand)
+        const response = await ddbDocClient.send(updateCommand)
         return response
     } catch (error) {
         console.error(`Error updating item: ${error}`)
