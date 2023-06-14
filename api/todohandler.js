@@ -21,7 +21,18 @@ const createTodo = async (event, context) => {
 
 const queryTodos = async (event, context) => {
     const tableName = process.env.DYNAMODB_TABLE;
-    const result = await dynamo.queryTable(tableName, `${event.queryStringParameters.userId}#todo`);
+    const queryInput = `${event.queryStringParameters.userId}#todo`
+    const result = await dynamo.queryTable(tableName, queryInput);
+    return {
+        statusCode: 200,
+        body: JSON.stringify(result)
+    }
+}
+
+const deleteTodo = async (event, context) => {
+    const tableName = process.env.DYNAMODB_TABLE;
+    const item = JSON.parse(event.body)
+    const result = await dynamo.deleteItem(tableName, item.id, item.userId)
     return {
         statusCode: 200,
         body: JSON.stringify(result)
@@ -30,5 +41,6 @@ const queryTodos = async (event, context) => {
 
 module.exports = {
     createTodo,
-    queryTodos
+    queryTodos,
+    deleteTodo
 }

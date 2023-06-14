@@ -1,4 +1,4 @@
-const { DynamoDBClient, PutItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, PutItemCommand, DeleteItemCommand } = require("@aws-sdk/client-dynamodb");
 const { QueryCommand } = require("@aws-sdk/lib-dynamodb");
 const { v4: uuidv4 } = require("uuid");
 const currentDate = new Date();
@@ -56,8 +56,34 @@ const queryTable = async (tableName, gsi1pk) => {
     }
 }
 
+const deleteItem = async (tableName, todoId, userId) => {
+    const client = new DynamoDBClient({ region: 'us-east-1' });
+
+    const params = {
+        TableName: tableName,
+        Key: {
+            id: {
+                "S": todoId
+            },
+            userId: {
+                "S": userId
+            }
+        }
+    }
+
+    const deleteCommand = new DeleteItemCommand(params)
+
+    try {
+        console.log(params);
+        const response = await client.send(deleteCommand)
+        return response
+    } catch (error) {
+        console.error(`Error deleting item: ${error}`)
+    }
+}
+
 module.exports = {
     putItem,
-    scanTable,
-    queryTable
+    queryTable,
+    deleteItem
 };
