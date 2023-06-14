@@ -1,34 +1,33 @@
 const { DynamoDBClient, PutItemCommand, DeleteItemCommand, UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
-const { QueryCommand, } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
+const client = new DynamoDBClient({});
+const ddbDocClient = DynamoDBDocumentClient.from(client)
 const { v4: uuidv4 } = require("uuid");
-const currentDate = new Date();
 
 const putItem = async (item) => {
-    // Create an instance of the DynamoDB client
-    const client = new DynamoDBClient({ region: "us-east-1" });
-    const params = {
+    const currentDate = new Date();
+
+    const input = {
         TableName: process.env.DYNAMODB_TABLE,
         Item: {
-            id: { S: uuidv4() },
-            userId: { S: item.userId },
-            title: { S: item.title },
-            description: { S: item.description },
-            createdAt: { S: currentDate.toISOString() },
-            status: { S: item.status },
-            entityType: { S: 'todo' },
-            gsi1pk: { S: `${item.userId}#todo` }
+            id: uuidv4(),
+            userId: item.userId,
+            title: item.title,
+            description: item.description,
+            createdAt: currentDate.toISOString(),
+            status: item.status,
+            entityType: "todo",
+            gsi1pk: `${item.userId}#todo`
         }
     }
-    // Create a PutItem command with the prepared parameters
-    const command = new PutItemCommand(params);
+
+    const command = new PutCommand(input)
 
     try {
-        // Execute the PutItem command
-        await client.send(command);
-        console.log("Item put successfully");
-        return { success: true, message: "Item put successfully" };
+        const response = await ddbDocClient.send(command)
+        return { success: true, message: response }
     } catch (error) {
-        console.log("Error putting item:");
+        console.error(`Error putting item ${error}`);
         return { success: false, message: "Error putting item" };
     }
 };
