@@ -5,7 +5,7 @@ const todoTable = process.env.DYNAMODB_TABLE
 const createTodo = async (event, context) => {
     const requestBody = JSON.parse(event.body);
     const todo = requestBody;
-    const result = await dynamo.putItem(todo);
+    const result = await dynamo.putItem(todoTable, todo);
     if (result.success == true) {
         return {
             statusCode: 200,

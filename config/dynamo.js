@@ -4,11 +4,11 @@ const client = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 const { v4: uuidv4 } = require("uuid");
 
-const putItem = async (item) => {
+const putItem = async (tableName, item) => {
     const currentDate = new Date();
 
     const input = {
-        TableName: process.env.DYNAMODB_TABLE,
+        TableName: tableName,
         Item: {
             id: uuidv4(),
             userId: item.userId,
