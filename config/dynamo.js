@@ -1,6 +1,6 @@
-const { DynamoDBClient, PutItemCommand, DeleteItemCommand, UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, QueryCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
-const client = new DynamoDBClient({});
+const { DynamoDBClient, UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand, PutCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+const client = new DynamoDBClient({ region: 'us-east-1' });
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 const { v4: uuidv4 } = require("uuid");
 
@@ -33,8 +33,6 @@ const putItem = async (tableName, item) => {
 };
 
 const queryTable = async (tableName, gsi1pk) => {
-    const client = new DynamoDBClient({ region: 'us-east-1' });
-
     const params = {
         TableName: tableName,
         IndexName: 'gsi1pk',
@@ -47,7 +45,7 @@ const queryTable = async (tableName, gsi1pk) => {
     const queryCommand = new QueryCommand(params)
 
     try {
-        const response = await client.send(queryCommand)
+        const response = await ddbDocClient.send(queryCommand)
         const items = response.Items;
         return items;
     } catch (error) {
@@ -56,25 +54,15 @@ const queryTable = async (tableName, gsi1pk) => {
 }
 
 const deleteItem = async (tableName, todoId, userId) => {
-    const client = new DynamoDBClient({ region: 'us-east-1' });
 
-    const params = {
+    const commandInput = {
         TableName: tableName,
-        Key: {
-            id: {
-                "S": todoId
-            },
-            userId: {
-                "S": userId
-            }
-        }
+        Key: { id: todoId, userId: userId }
     }
-
-    const deleteCommand = new DeleteItemCommand(params)
-
+    const deleteCommmand = new DeleteCommand(commandInput)
+    
     try {
-        console.log(params);
-        const response = await client.send(deleteCommand)
+        const response = await ddbDocClient.send(deleteCommmand)
         return response
     } catch (error) {
         console.error(`Error deleting item: ${error}`)
