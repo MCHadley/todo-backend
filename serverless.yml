@@ -77,6 +77,23 @@ functions:
         Action:
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self.provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}
+  updateTodo:
+    handler: api/todohandler.updateTodo
+    events:
+      - httpApi:
+          path: /todos
+          method: PUT
+    response:
+      headers:
+        Content-Type: "'application/json'"
+      statusCodes:
+        200:
+          pattern: ""
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self.provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}
 
 custom:
   serverless-offline:

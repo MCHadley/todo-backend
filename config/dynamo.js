@@ -1,5 +1,5 @@
-const { DynamoDBClient, PutItemCommand, DeleteItemCommand } = require("@aws-sdk/client-dynamodb");
-const { QueryCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBClient, PutItemCommand, DeleteItemCommand, UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
+const { QueryCommand, } = require("@aws-sdk/lib-dynamodb");
 const { v4: uuidv4 } = require("uuid");
 const currentDate = new Date();
 
@@ -82,8 +82,40 @@ const deleteItem = async (tableName, todoId, userId) => {
     }
 }
 
+const updateItem = async (tableName, todoItem) => {
+    const client = new DynamoDBClient({ region: 'us-east-1' });
+    const params = {
+        TableName: tableName,
+        Key: {
+            id: { "S": todoItem.id },
+            userId: { "S": todoItem.userId }
+        },
+        UpdateExpression: 'SET #status = :status, #description = :description, #title = :title',
+        ExpressionAttributeNames: {
+            '#status': 'status',
+            '#description': 'description',
+            '#title': 'title'
+        },
+        ExpressionAttributeValues: {
+            ':status': { "S": todoItem.status },
+            ':description': { "S": todoItem.description },
+            ':title': { "S": todoItem.title }
+        }
+    };
+    const updateCommand = new UpdateItemCommand(params)
+
+    try {
+        const response = await client.send(updateCommand)
+        return response
+    } catch (error) {
+        console.error(`Error updating item: ${error}`)
+    }
+
+}
+
 module.exports = {
     putItem,
     queryTable,
-    deleteItem
+    deleteItem,
+    updateItem
 };
