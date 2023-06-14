@@ -1,10 +1,11 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
-const client = new DynamoDBClient({ region: 'us-east-1' });
-const ddbDocClient = DynamoDBDocumentClient.from(client)
 const { v4: uuidv4 } = require("uuid");
 
 const putItem = async (tableName, item) => {
+    const client = new DynamoDBClient({ region: 'us-east-1' });
+    const ddbDocClient = DynamoDBDocumentClient.from(client)
+
     const currentDate = new Date();
 
     const input = {
@@ -20,7 +21,6 @@ const putItem = async (tableName, item) => {
             gsi1pk: `${item.userId}#todo`
         }
     }
-
     const command = new PutCommand(input)
 
     try {
@@ -28,11 +28,15 @@ const putItem = async (tableName, item) => {
         return { success: true, message: response }
     } catch (error) {
         console.error(`Error putting item ${error}`);
-        return { success: false, message: "Error putting item" };
     }
+    ddbDocClient.destroy();
+    client.destroy();
 };
 
 const queryTable = async (tableName, gsi1pk) => {
+    const client = new DynamoDBClient({ region: 'us-east-1' });
+    const ddbDocClient = DynamoDBDocumentClient.from(client)
+
     const params = {
         TableName: tableName,
         IndexName: 'gsi1pk',
@@ -51,9 +55,13 @@ const queryTable = async (tableName, gsi1pk) => {
     } catch (error) {
         console.error('Error querying table:', error);
     }
+    ddbDocClient.destroy();
+    client.destroy();
 }
 
 const deleteItem = async (tableName, todoId, userId) => {
+    const client = new DynamoDBClient({ region: 'us-east-1' });
+    const ddbDocClient = DynamoDBDocumentClient.from(client)
 
     const commandInput = {
         TableName: tableName,
@@ -67,9 +75,14 @@ const deleteItem = async (tableName, todoId, userId) => {
     } catch (error) {
         console.error(`Error deleting item: ${error}`)
     }
+    ddbDocClient.destroy();
+    client.destroy();
 }
 
 const updateItem = async (tableName, todoItem) => {
+    const client = new DynamoDBClient({ region: 'us-east-1' });
+    const ddbDocClient = DynamoDBDocumentClient.from(client)
+
     const params = {
         TableName: tableName,
         Key: { id: todoItem.id, userId: todoItem.userId },
@@ -95,7 +108,8 @@ const updateItem = async (tableName, todoItem) => {
     } catch (error) {
         console.error(`Error updating item: ${error}`)
     }
-
+    ddbDocClient.destroy();
+    client.destroy();
 }
 
 module.exports = {
