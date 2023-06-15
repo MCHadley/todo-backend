@@ -11,7 +11,6 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:Query
-        - dynamodb:Scan
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
@@ -33,11 +32,6 @@ functions:
       - httpApi:
           path: /todos
           method: post
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${self.provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}
   getTodos:
     handler: api/todohandler.queryTodos
     events:
@@ -53,13 +47,6 @@ functions:
       statusCodes:
         200:
           pattern: ""
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Query
-          - dynamodb:Scan
-          - dynamodb:GetItem
-        Resource: arn:aws:dynamodb:${self.provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}
   deleteTodo:
     handler: api/todohandler.deleteTodo
     events:
@@ -72,11 +59,6 @@ functions:
       statusCodes:
         200:
           pattern: ""
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:DeleteItem
-        Resource: arn:aws:dynamodb:${self.provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}
   updateTodo:
     handler: api/todohandler.updateTodo
     events:
@@ -89,11 +71,6 @@ functions:
       statusCodes:
         200:
           pattern: ""
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${self.provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}
 
 custom:
   serverless-offline:
