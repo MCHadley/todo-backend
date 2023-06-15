@@ -72,6 +72,49 @@ functions:
         200:
           pattern: ""
 
+resources:
+  Resources:
+    TodoTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: todos
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+          - AttributeName: description
+            AttributeType: S
+          - AttributeName: entityType
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+          - AttributeName: title
+            AttributeType: S
+          - AttributeName: gsi1pk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: userId
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        GlobalSecondaryIndexes:
+          - IndexName: gsi1pk
+            KeySchema:
+              - AttributeName: gsi1pk
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+
 custom:
   serverless-offline:
     httpPort: 3000
