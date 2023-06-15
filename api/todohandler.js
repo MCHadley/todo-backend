@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict';
 const dynamo = require('../utils/dynamo');
 const {responseHandler} = require('../utils/Utils');
