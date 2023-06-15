@@ -71,7 +71,7 @@ const deleteItem = async (tableName, todoId, userId) => {
 
     try {
         const response = await ddbDocClient.send(deleteCommmand)
-        return response
+        return { success: true, message: response }
     } catch (error) {
         console.error(`Error deleting item: ${error}`)
     }
@@ -104,7 +104,7 @@ const updateItem = async (tableName, todoItem) => {
 
     try {
         const response = await ddbDocClient.send(updateCommand)
-        return response
+        return { success: true, message: response }
     } catch (error) {
         console.error(`Error updating item: ${error}`)
     }
