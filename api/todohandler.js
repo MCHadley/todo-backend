@@ -1,14 +1,30 @@
 'use strict';
 const dynamo = require("../config/dynamo");
 const todoTable = process.env.DYNAMODB_TABLE
+const { v4: uuidv4 } = require("uuid");
+
 
 const createTodo = async (event, context) => {
     const requestBody = JSON.parse(event.body);
     const todo = requestBody;
-    const result = await dynamo.putItem(todoTable, todo);
+    const currentDate = new Date();
+    const input = {
+        TableName: todoTable,
+        Item: {
+            id: uuidv4(),
+            userId: todo.userId,
+            title: todo.title,
+            description: todo.description,
+            createdAt: currentDate.toISOString(),
+            status: todo.status,
+            entityType: "todo",
+            gsi1pk: `${todo.userId}#todo`
+        }
+    }
+    const result = await dynamo.putItem(input);
     if (result.success == true) {
         return {
-            statusCode: 200,
+            statusCode: 201,
             body: JSON.stringify(result.message)
         }
     } else {
@@ -20,8 +36,16 @@ const createTodo = async (event, context) => {
 }
 
 const queryTodos = async (event, context) => {
-    const queryInput = `${event.queryStringParameters.userId}#todo`
-    const result = await dynamo.queryTable(todoTable, queryInput);
+    const gsi1pk = `${event.queryStringParameters.userId}#todo`
+    const params = {
+        TableName: todoTable,
+        IndexName: 'gsi1pk',
+        KeyConditionExpression: 'gsi1pk = :gsi1pk',
+        ExpressionAttributeValues: {
+            ':gsi1pk': gsi1pk
+        }
+    }
+    const result = await dynamo.queryTable(params);
     return {
         statusCode: 200,
         body: JSON.stringify(result)
@@ -30,7 +54,11 @@ const queryTodos = async (event, context) => {
 
 const deleteTodo = async (event, context) => {
     const item = JSON.parse(event.body)
-    const result = await dynamo.deleteItem(todoTable, item.id, item.userId)
+    const commandInput = {
+        TableName: todoTable,
+        Key: { id: item.todoid, userId: todo.userId }
+    }
+    const result = await dynamo.deleteItem(commandInput)
     if (result.success == true) {
         return {
             statusCode: 200,
@@ -46,7 +74,23 @@ const deleteTodo = async (event, context) => {
 
 const updateTodo = async (event, context) => {
     const item = JSON.parse(event.body)
-    const result = await dynamo.updateItem(todoTable, item)
+    const params = {
+        TableName: tableName,
+        Key: { id: item.id, userId: item.userId },
+        UpdateExpression: 'SET #status = :s, #description = :d, #title = :t',
+        ExpressionAttributeNames: {
+            "#status": "status",
+            "#description": "description",
+            "#title": "title"
+
+        },
+        ExpressionAttributeValues: {
+            ":s": item.status,
+            ":d": item.description,
+            ":t": item.title
+        }
+    }
+    const result = await dynamo.updateItem(params)
     if (result.success == true) {
         return {
             statusCode: 200,
