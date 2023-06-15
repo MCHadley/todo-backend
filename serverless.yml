@@ -25,13 +25,13 @@ functions:
     events:
       - httpApi:
           path: /
-          method: get
+          method: GET
   createTodo:
     handler: api/todohandler.createTodo
     events:
       - httpApi:
           path: /todos
-          method: post
+          method: POST
   getTodos:
     handler: api/todohandler.queryTodos
     events:
