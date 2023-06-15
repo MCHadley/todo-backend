@@ -1,5 +1,6 @@
 'use strict';
-const dynamo = require("../config/dynamo");
+const dynamo = require("../utils/dynamo");
+const { responseHandler } = require("../utils/Utils")
 const todoTable = process.env.DYNAMODB_TABLE
 const { v4: uuidv4 } = require("uuid");
 
@@ -21,18 +22,14 @@ const createTodo = async (event, context) => {
             gsi1pk: `${todo.userId}#todo`
         }
     }
-    const result = await dynamo.putItem(input);
-    if (result.success == true) {
-        return {
-            statusCode: 201,
-            body: JSON.stringify(result.message)
-        }
-    } else {
-        return {
-            statusCode: 400,
-            body: JSON.stringify(result.message)
-        }
+    let response;
+    try {
+        const result = await dynamo.putItem(input);
+        response = responseHandler(200, "Todo was created")
+    } catch (error) {
+        response = responseHandler(400, "An error has occured, todo not added")
     }
+    return response
 }
 
 const queryTodos = async (event, context) => {
@@ -45,11 +42,14 @@ const queryTodos = async (event, context) => {
             ':gsi1pk': gsi1pk
         }
     }
-    const result = await dynamo.queryTable(params);
-    return {
-        statusCode: 200,
-        body: JSON.stringify(result)
+    let response;
+    try {
+        const result = await dynamo.queryTable(params);
+        response = responseHandler(200, result.Items)
+    } catch (error) {
+        response = responseHandler(400, "An error has occured, todos not retreived")
     }
+    return response
 }
 
 const deleteTodo = async (event, context) => {
@@ -58,18 +58,15 @@ const deleteTodo = async (event, context) => {
         TableName: todoTable,
         Key: { id: item.id, userId: item.userId }
     }
-    const result = await dynamo.deleteItem(commandInput)
-    if (result.success == true) {
-        return {
-            statusCode: 200,
-            body: JSON.stringify(result)
-        }
-    } else {
-        return {
-            statusCode: 400,
-            body: JSON.stringify('There was an error deleting your item')
-        }
+    let response;
+    try {
+        const result = await dynamo.deleteItem(commandInput)
+        response = responseHandler(200, "Item deleted")
+    } catch (error) {
+        response = responseHandler(400, "An error has occured deleting this item")
     }
+    return response
+
 }
 
 const updateTodo = async (event, context) => {
@@ -90,18 +87,14 @@ const updateTodo = async (event, context) => {
             ":t": item.title
         }
     }
-    const result = await dynamo.updateItem(params)
-    if (result.success == true) {
-        return {
-            statusCode: 200,
-            body: JSON.stringify(result)
-        }
-    } else {
-        return {
-            statusCode: 400,
-            body: JSON.stringify('There was an error updating your item')
-        }
+    let response;
+    try {
+        const result = await dynamo.updateItem(params)
+        response = responseHandler(200, "Item was updated")
+    } catch (error) {
+        response = responseHandler(400, "An error has occured updating this item")
     }
+    return response;
 }
 
 module.exports = {
