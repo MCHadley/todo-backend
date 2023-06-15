@@ -45,9 +45,18 @@ const queryTodos = async (event, context) => {
     },
   };
   let response;
+  const selectedProps = ['userId', 'status', 'createdAt', 'description', 'title', 'id'];
+  const todoReturn = [];
   try {
     const result = await dynamo.queryTable(params);
-    response = responseHandler(200, result.Items);
+    for (let i = 0; i < result.Count; i++) {
+      const item = {};
+      for (const prop of selectedProps) {
+        item[prop] = result.Items[i][prop];
+      }
+      todoReturn.push(item);
+    }
+    response = responseHandler(200, todoReturn);
   } catch (error) {
     response = responseHandler(400, 'An error has occured, todos not retreived');
   }
