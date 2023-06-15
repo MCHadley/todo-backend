@@ -1,5 +1,4 @@
 /* eslint-disable require-jsdoc */
-
 function responseHandler(statusCode, message) {
   const response = {
     statusCode: statusCode,
@@ -12,5 +11,5 @@ function responseHandler(statusCode, message) {
 }
 
 module.exports = {
-  responseHandler: responseHandler,
+  responseHandler,
 };
