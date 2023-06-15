@@ -44,9 +44,6 @@ functions:
     response:
       headers:
         Content-Type: "'application/json'"
-      statusCodes:
-        200:
-          pattern: ""
   deleteTodo:
     handler: api/todohandler.deleteTodo
     events:
@@ -56,9 +53,6 @@ functions:
     response:
       headers:
         Content-Type: "'application/json'"
-      statusCodes:
-        200:
-          pattern: ""
   updateTodo:
     handler: api/todohandler.updateTodo
     events:
@@ -68,9 +62,6 @@ functions:
     response:
       headers:
         Content-Type: "'application/json'"
-      statusCodes:
-        200:
-          pattern: ""
 
 resources:
   Resources:
