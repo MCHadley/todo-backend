@@ -56,7 +56,7 @@ const deleteTodo = async (event, context) => {
     const item = JSON.parse(event.body)
     const commandInput = {
         TableName: todoTable,
-        Key: { id: item.todoid, userId: todo.userId }
+        Key: { id: item.id, userId: item.userId }
     }
     const result = await dynamo.deleteItem(commandInput)
     if (result.success == true) {
@@ -75,7 +75,7 @@ const deleteTodo = async (event, context) => {
 const updateTodo = async (event, context) => {
     const item = JSON.parse(event.body)
     const params = {
-        TableName: tableName,
+        TableName: todoTable,
         Key: { id: item.id, userId: item.userId },
         UpdateExpression: 'SET #status = :s, #description = :d, #title = :t',
         ExpressionAttributeNames: {
