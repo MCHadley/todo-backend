@@ -1,6 +1,8 @@
 "use strict";
+const env = process.env.environment;
 
 module.exports.hello = async (event) => {
+  console.log(process.env)
   return {
     statusCode: 200,
     body: JSON.stringify(
