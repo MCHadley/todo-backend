@@ -1,8 +1,8 @@
 'use strict';
 const dynamo = require('../utils/dynamo');
-const { responseHandler } = require('../utils/Utils');
+const {responseHandler} = require('../utils/Utils');
 const todoTable = process.env.DYNAMODB_TABLE;
-const { v4: uuidv4 } = require('uuid');
+const {v4: uuidv4} = require('uuid');
 
 
 const createTodo = async (event, context) => {
@@ -73,7 +73,7 @@ const updateTodo = async (event, context) => {
   const item = JSON.parse(event.body);
   const params = {
     TableName: todoTable,
-    Key: { id: item.id, userId: item.userId },
+    Key: {id: item.id, userId: item.userId},
     UpdateExpression: 'SET #status = :s, #description = :d, #title = :t',
     ExpressionAttributeNames: {
       '#status': 'status',
