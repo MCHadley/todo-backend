@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+/* eslint-disable max-len */
 'use strict';
 const dynamo = require('../utils/dynamo');
 const {responseHandler} = require('../utils/Utils');
@@ -48,7 +49,6 @@ const queryTodos = async (event, context) => {
     const result = await dynamo.queryTable(params);
     response = responseHandler(200, result.Items);
   } catch (error) {
-    // eslint-disable-next-line max-len
     response = responseHandler(400, 'An error has occured, todos not retreived');
   }
   return response;

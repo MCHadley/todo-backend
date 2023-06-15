@@ -1,5 +1,5 @@
+/* eslint-disable max-len */
 const {DynamoDBClient} = require('@aws-sdk/client-dynamodb');
-// eslint-disable-next-line max-len
 const {DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand, DeleteCommand} = require('@aws-sdk/lib-dynamodb');
 const client = new DynamoDBClient({region: 'us-east-1'});
 const ddbDocClient = DynamoDBDocumentClient.from(client);
